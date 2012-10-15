@@ -1,0 +1,10 @@
+Package: switchBox
+Version: 0.99.1
+Date: 2012-10-15
+Title: Prediction utilities using K-Top (disjoint) Scoring Pairs (KTSP)
+Author: Bahman Afsari <bahman@jhu.edu>, Luigi Marchionni <marchion@jhu.edu>
+Maintainer: Bahman Afsari <bahman@jhu.edu>, Luigi Marchionni <marchion@jhu.edu>
+Depends: R (>= 2.13.1)
+Description: The package provides utilities to perform predictions using K-TSP classifier for binary data. Each pair refers to a pair of features. The score of the pair is difference of the probability that the first feature is bigger than the second one. K-TSP finds the top disjoint scoring pair of features.
+License: GPL-2 
+Packaged:
