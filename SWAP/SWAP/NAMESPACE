@@ -1,0 +1,10 @@
+useDynLib(KTSP)
+
+export(SWAP.rank,
+	SWAP.CalculateSignedScore,
+	SWAP.CalculateSignedScore.Restricted,
+	SWAP.KTSP.Train,
+	SWAP.KTSP.Train.Plain,
+	SWAP.KTSP.Statitsics,
+	SWAP.KTSP.Classify,
+	SWAP.Filter.Wilcoxon)
