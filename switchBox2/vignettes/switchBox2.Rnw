@@ -1,0 +1,591 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Anuj Gupta & Luigi Marchionni
+%%% March 05 2012
+%%% Baltimore
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \VignetteIndexEntry{Working with the matchBox package}
+% \VignetteKeywords{Annotation, Microarray}
+% \VignettePackage{matchBox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%% Begin Document
+\documentclass[12pt]{article}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%% Preamble
+%\input{preamble}
+\usepackage{fullpage}
+\usepackage{times}
+\usepackage[colorlinks=TRUE, urlcolor=blue, citecolor=blue]{hyperref}
+
+%%% Additional packages
+\usepackage{Sweave}
+\usepackage{authblk}
+\usepackage{color}
+\usepackage[usenames, dvipsnames]{xcolor}
+
+%%% Sweave options
+\SweaveOpts{prefix.string=plots, eps=FALSE,echo=TRUE, keep.source=TRUE}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% New commands for R stuff
+\newcommand{\software}[1]{\textsf{#1}}
+\newcommand{\R}{\software{R}}
+\newcommand{\Bioc}{\software{Bioconductor}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\texttt{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% fancy Sweave
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{xleftmargin=1em, fontshape=sl, formatcom=\color{MidnightBlue}, fontsize=\footnotesize}
+%\DefineVerbatimEnvironment{Sinput}{Verbatim} {xleftmargin=1em}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=1em,fontshape=sl,formatcom=\color{OliveGreen}, fontsize=\footnotesize}
+%\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=1em}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=1em,fontshape=sl,formatcom=\color{BrickRed}, fontsize=\footnotesize}
+%\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=1em}
+\fvset{listparameters={\setlength{\topsep}{0pt}}}
+
+\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%% Title
+%\title{Computing and plotting Correspondence-At-Top (CAT) curves among ranked vectors of features}
+\title{Computing and plotting agreement among ranked vectors of features with matchBox.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Authors 
+\author[1]{Anuj Gupta}
+\author[1]{Luigi Marchionni}
+
+%%% Affiliations
+\affil[1]{The Sidney Kimmel Comprehensive Cancer Center,
+  
+  Johns Hopkins University School of Medicine}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Date
+\date{Modified: September 5, 2012.  Compiled: \today}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Document
+\begin{document}
+
+\setlength{\parskip}{0.2\baselineskip}
+\setlength{\parindent}{0pt}
+\setkeys{Gin}{width=\textwidth}
+
+\maketitle
+\tableofcontents
+
+<<start, eval=TRUE, echo=FALSE, cache=FALSE>>=
+options(width=85)
+options(continue=" ")
+rm(list=ls())
+@ 
+
+%\newpage
+
+\section{ {\Large \bf {Introduction}} }
+The \Rpackage{matchBox} package allows to compare ranked vectors ({\it i.e.} 
+by differential expression) 
+of features ({\it i.e.} genes, or probe sets), using Correspondence-At-the-Top (CAT) curves. 
+A CAT curve displays the overlapping proportion between two ranked vectors of identifiers 
+against the number of considered features.
+This techiques was originally envisaged for comparing differential gene expression 
+results obtained from distinct microarray platforms in different laboratories 
+(see Irizarry et al, Nat Methods (2005) \cite{Irizarry2005}), and further used
+to compare differential gene expression across distinct studies
+(see Ross et al, Prostate (2011) \cite{Ross:2011dm}, and Benassi et al., 
+Cancer Discovery (2012) \cite{Benassi:2012wo}).
+
+
+The \Rpackage{matchBox} package contains several utilities 
+enabling the following:
+
+\begin{enumerate}
+  \item To filter redundant features in a \Robject{data.frame}
+    ({\it i.e.} filtering multiple probe sets pointing to the same gene);
+  \item To merge multiple data sets together based on a common set of identifiers;
+  \item To compute the CAT curves probability intervals;
+  \item To nicely plot the CAT curves.
+\end{enumerate}
+
+\vspace{5 mm}
+Briefly, CAT curves enable to compare the correspondence of two vectors
+ordered by a predefined ranking statistics at their top.
+This is accomplished through:
+
+\begin{enumerate}
+\item Ordering the two vectors according to a desired statistics ( {\it i.e.}
+  differential gene expression, significance, probability, \dots);
+\item Computing the proportion of top ranking elements in common
+  between the two vector for a given vector size  ({\it i.e.} top 5 features);
+\item Reiterating the two steps above increasing the vector size up to all 
+  common elements ({\it i.e.} the top 6 identifiers, then the top 7, 8, 9, 
+  \dots, all features);
+\item Plotting the proportion of common elements against the increasing vector size.
+\end{enumerate}
+
+Since CAT curves evaluate agreement at the top of ranked vectors
+they are particularly useful in gene expression analysis, where only a small fraction 
+of genes is expected to be differentially expressed over the large total number 
+of analyzed genes.
+
+
+\section{ {\Large \bf {Preparing the Data}} }
+
+\subsection{Data structure}
+Download and install the package \Rpackage{matchBox} from {\Bioc}.
+<<eval=FALSE,echo=TRUE,cache=FALSE>>=
+source("http://bioconductor.org/biocLite.R")
+biocLite("matchBox")
+@ 
+
+Load the library.
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+require(matchBox)
+@
+
+Load the example data contained in the \Rpackage{matchBox} package.
+<<loadmatchBoxExpression,eval=TRUE,echo=TRUE,cache=FALSE>>=
+data(matchBoxExpression)
+@
+
+The object \Robject{matchBoxExpression} is a list of data.frames containing 
+  differential gene expression analysis resulst from three distinct experiments.
+  These data.frames will be used to retrieve the identifiers 
+  and the ranking statistics for computing overlapping proportions displayed
+  by the CAT curves.
+  Below is shown the structure of \Robject{matchBoxExpression}:
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+sapply(matchBoxExpression, class)
+sapply(matchBoxExpression, dim)
+str(matchBoxExpression)
+@
+
+
+\vspace{2 mm}
+
+\subsection{Removing redundancy}
+ In order to compute the CAT curves, and then compare the results 
+  obtained from the three experiments, it is necessary to identify the set 
+  of {\bf non-redundant}  features in common among the three data sets.
+  The \Rfunction{filterRedundant} function enables to remove the redundant 
+  features within each \Robject{data.frame} prior computing the subset of  
+  of common identifiers across the three data sets.
+  The argument \Rfunarg{idCol} specifies the index or the name 
+  of the column containing redundant identifiers, 
+  while the other arguments enable to control the method
+  used to remove the redundancy, as explained in the help for this function.
+  
+  By default  the \Rfunction{filterRedundant} function will keep the feature
+  with the largest absolute ranking statistics, as defined by the
+  \Rfunarg{byCol} argument. The \Rfunarg{method} argument enables to 
+  control which feature to keep and which to discard.
+  Currently available methods are: \Rfunarg{maxORmin}, \Rfunarg{geoMean},
+  \Rfunarg{random}, \Rfunarg{mean}, and \Rfunarg{median}
+  (see help for  \Rfunction{filterRedundant}).
+
+  In the example below we are using an \Rfunction{lapply} call to remove 
+  the redundant features from all the three data.frames at once. 
+  To this end we will use gene symbols to identify the redundant features
+  and the t-statistics to select which feature to keep. 
+  
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+sapply(matchBoxExpression, function(x) any(duplicated(x[, 1])) )
+allDataBySymbolAndT <- lapply(matchBoxExpression, filterRedundant, 
+			      idCol="SYMBOL", byCol="t", absolute=TRUE)
+@
+
+ Each data.frame now contains only unique features.
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+sapply(allDataBySymbolAndT, dim)
+sapply(allDataBySymbolAndT, function(x) any(duplicated(x[, 1])) )
+@
+
+
+  In the example below we are removing the redundant features
+  using Enrez Gene identifiers to select the redundant features
+  and the {\bf signed} log2 fold-change to select which feature to keep. 
+  
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+sapply(matchBoxExpression, function(x) any(duplicated(x[, 1])) )
+allDataByEGIDAndLogFC <- lapply(matchBoxExpression, filterRedundant, 
+				idCol="ENTREZID", byCol="logFC", absolute=FALSE)
+@
+
+ Each of the data.frame now contains only unique features.
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+sapply(allDataByEGIDAndLogFC, dim)
+sapply(allDataByEGIDAndLogFC, function(x) any(duplicated(x[, 1])) )
+@
+
+
+  In the example below we are removing the redundant features
+  using Enrez Gene identifiers to select the redundant features,
+  and the median adjusted P-value will be used  to summarize 
+  the redundant features.
+  
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+sapply(matchBoxExpression, function(x) any(duplicated(x[, 1])) )
+allDataByEGIDAndMedianFDR <- lapply(matchBoxExpression, filterRedundant, 
+				    idCol="ENTREZID", byCol="adj.P.Val", absolute=FALSE,
+				    method="median")
+@
+
+ Each of the data.frame now contains only unique features.
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+sapply(allDataByEGIDAndMedianFDR, dim)
+sapply(allDataByEGIDAndMedianFDR, function(x) any(duplicated(x[, 1])) )
+@
+
+
+\subsection{Merging the data}
+ After removing the redundant features it is now possible to obtain 
+  the common unique features across all the data sets 
+  using the function \Rfunction{mergeData}.
+  This function finds the intersection across all the data.frames, 
+  and extract the desired ranking statistics from each one.
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+data <- mergeData(allDataBySymbolAndT, idCol="SYMBOL", byCol="t")
+@
+
+ The object \Robject{data} is a \Robject{data.frame} 
+  containing only the common set of features across all three 
+  data.frames and the ranking statistics values of choice 
+  collected from each data.frame.
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+sapply(allDataBySymbolAndT, dim)
+dim(data)
+str(data)
+@
+
+\section{ {\Large \bf {Correspondance at the Top Curves}}}
+The \Rfunction{computeCat} {\R} function enables to compute the 
+overlapping proportions of features among ranked vectors of identifiers. 
+Such proportions will be subsequently used to produce the CAT curves.
+When computing CAT curves a number of  paramenters must be specificied
+to control the behaviour of the \Rfunction{computeCat} function.
+In particular the following information will determine how the vectors of
+will be ordered, and which vectors will be compaired, and 
+therefore must be carefully considered:
+
+\begin{itemize}
+\item Whether or not the ranking statistics used to order the features 
+  is signed ({\it i.e.} t-statistics or F-statistics like);
+\item Whether the ranking statistics should be used to order the features 
+  by decreasing or increasing order. For instance in the case of differential 
+  gene expression between group A and B:
+  \begin{itemize}
+  \item Ordering by {\bf decreasing signed} t-statistics will compute the CAT 
+    curve for the  genes up-regulated in group A compared to group B;
+  \item Ordering by {\bf increasing signed} t-statistics will compute the CAT
+    curve for  the genes down-regulated in group A compared to group B;
+  \item Ordering by {\bf decreasing absolute} t-statistics will compute the CAT
+    curve for the differentiallly expressed genes between the two groups;
+  \item Ordering by {\bf increasing absolute} t-statistics will compute the CAT
+    curve for the genes that {\bf are not differentially expressed} between 
+    the two groups;
+  \end{itemize}
+\item Whether to compare all possible vector combinations, or to select one
+  of the vectors as the reference;
+\item Whether the overlapping proportion should be computed using equal ranks 
+  or equal statistics;
+\end{itemize}
+
+
+\subsection{Computing CAT curves without  a reference ranking}
+
+The example below shows how to compute CAT curves {\bf without} selecting 
+one of the vectors  as the reference, using {\bf decreasing} ranks 
+({\it i.e.} up-regulated genes are at the top of the list):
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+catHigh2LowNoRefByEqualRanks <- computeCat(data = data, idCol = 1, 
+					   method="equalRank", decreasing=TRUE)
+@
+
+The example below shows to compute CAT curves {\bf without} selecting 
+a vector as the reference, using {\bf increasing} ranks 
+({\it i.e.} down-regulated genes are at the top of the list):
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+catLow2HighNoRefByEqualRanks <- computeCat(data = data, idCol = 1, 
+					   method="equalRank", decreasing=FALSE)
+@
+
+
+\subsection{Computing CAT curves using a reference ranking}
+
+The example below shows how to compute CAT curves selecting 
+one of the vectors as the reference, using decreasing ranks:
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+catHigh2LowWithRefByEqualRanks <- computeCat(data = data, idCol = 1, 
+					     ref="dataSetA.t",  method="equalRank", decreasing=TRUE)
+@
+
+The \Robject{catHigh2LowWithRefByEqualRanks} contains the computed overlaps,
+for decreasing ranks ({\it i.e.} up-regulated genes are at the top of the list):
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+str(catHigh2LowWithRefByEqualRanks)
+@
+
+The example below shows to compute CAT curves selecting one of the data set 
+as reference, using decreasing t-statistics:
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+catHigh2LowWithRefByEqualStats <- computeCat(data = data, idCol = 1, ref="dataSetA.t",
+					     method="equalStat", decreasing=TRUE)
+@
+
+The \Robject{catHigh2LowWithRefByEqualStats} contains the computed overlaps:
+for decreasing t-statistics ({\it i.e.} down-regulated genes):
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+str(catHigh2LowWithRefByEqualStats)
+@
+
+\subsection{Computing Probability Intervals}
+The \Rfunction{calcHypPI} {\R} function enables to compute
+the probability intervals for the CAT curves {\bf obtained using equal ranks}.
+Such intervals are based on the hypergeometric distribution
+(see Irizarry et al \cite{Irizarry2005} and Ross et al. \cite{Ross:2011dm}).
+Briefly, the \Rfunction{calcHypPI} uses \Rfunction{qhyper} quantile function
+to compute the {\bf expected} proportions of common features between 
+two ordered vectors of identifiers for a set of specified quantiles 
+of the hypergeometric distribution. 
+
+\vspace{5 mm}
+To understand the way such proportions are obtained
+we can use the analogy of drawing a certain number of balls 
+from an urn containing black and white balls, where black
+represents a failure (the vectors are in different order, 
+and therefore the features do not overlap),
+and white represent a success (the vectors are in the same order,
+and hence the features overlap).
+According to this analogy the \Rfunction{calcHypPI} function 
+uses the total number of features in common between the vectors
+as the total number of balls in the urn, 
+and the size of the vector being compared as the number of 
+balls drawn from the urn.
+Thus increasing vectors sizes (1, 2, 3, and so on until all features are used)
+correspond to an increasing number of balls drawn from the urn at each attempt.
+
+\vspace{5 mm}
+By default the \Rfunction{calcHypPI} function assumes that the top 10\% 
+of the features of the two vectors are similarly ordered. In our analogy, 
+therefore, the number of white balls in the urn corresponds to 10\%
+of the total common features between the vectors.
+This expectation can be modified by the user with the \Rfunarg{expectedProp} 
+argument. When \Rfunarg{expectedProp} is set equal to \Rfunarg{NULL}
+the number of white balls in the urn
+(i.e. the top ranking features in the correct order)
+corresponds to the number of balls that are drawn
+at each attempt (i.e. the increasing size of top features
+from each vector that are being compared).
+
+\vspace{5 mm}
+The example below shows how to compute probability intervals for CAT curves,
+using the default 0.1 expected proportion of top ranked features:
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+PIbyRefEqualRanks <- calcHypPI(data=data)
+@
+
+The \Robject{PIbyRefEqualRanks} contains the computed
+probability intervals for the CAT curves:
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+head(PIbyRefEqualRanks)
+@
+
+The example below shows how to compute probability intervals for CAT curves,
+setting the expected proportion of top ranked features to $0.3$:
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+PIbyRefEqualRanks03 <- calcHypPI(data=data, expectedProp=0.3)
+@
+
+The \Robject{PIbyRefEqualRanks03} contains the computed
+probability intervals for the CAT curves:
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+head(PIbyRefEqualRanks03)
+@
+
+The example below shows how to compute probability intervals for CAT curves,
+using the default 0.1 expected proportion of top ranked features, 
+for a set of specific hypergeometric distribution quantiles:
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+PIbyRefEqualRanksQuant <- calcHypPI(data=data, prob=c(0.75, 0.9, 0.95, 0.99) )
+@
+
+The \Robject{PIbyRefEqualRanksQuant} contains the computed
+probability intervals for the CAT curves:
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+head(PIbyRefEqualRanksQuant)
+@
+
+The example below shows how to compute probability intervals for CAT curves,
+without specifying a proportion of expected top ranked features:
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+PIbyRefEqualRanksNoExpectedProp <- calcHypPI(data=data, expectedProp=NULL)
+@
+
+The \Robject{PIbyRefEqualRanksNoExpectedProp} contains the computed
+probability intervals for the CAT curves:
+
+<<eval=TRUE,echo=TRUE,cache=FALSE>>=
+head(PIbyRefEqualRanksNoExpectedProp)
+@
+
+\section{ {\Large \bf {Plotting the results}}}
+
+The \Rfunction{plotCat} function can be used to plot the CAT curves
+along with probability intervals, as derived using the \Rfunction{calcHypPI} 
+function (see Figures~\ref{fig:one} and ~\ref{fig:two}, 
+for CAT curves computed using a reference ranking, Figure~\ref{fig:three} 
+for examples in which the reference was not used, 
+and Figure~\ref{fig:four} for CAT curves for which the proportion
+of expected top ranked features was not specified).
+
+\begin{figure}[htp]
+  \subsection{CAT curves based on equal ranks using a reference.}
+
+  The example below shows how to plot CAT curves based on equal ranks,
+  along with probability intervals based on a fixed expected proportion
+  of similarly ranked features of 30\%, using the data set A as the reference.
+
+  \begin{center}
+  \setkeys{Gin}{width=0.75\textwidth}
+<<label=fig1,eval=TRUE,echo=TRUE,cache=FALSE,fig=TRUE, width=10, height=6>>=
+plotCat(catData = catHigh2LowWithRefByEqualRanks, 
+	preComputedPI=PIbyRefEqualRanks03,
+	cex=1.2, lwd=1.2, cexPts=1.2, spacePts=30, col=c("red", "blue"),
+	main="CAT curves for decreasing t-statistics",
+	where="center", legend=TRUE, legCex=1, ncol=1,
+	plotLayout = layout(matrix(1:2, ncol = 2), widths = c(2,1)))
+@
+\end{center}
+\caption{\small CAT-plot for curves based on equal ranks, using data set A as the reference.
+ Lighter to darker grey shades represent probability intervals for distinct quantiles 
+ of the hypergeometric distribution (0.999999, 0.999,  0.99, 0.95), assuming
+ 30\% of the features to be similarly ranked.}
+\label{fig:one}
+\end{figure}
+
+\begin{figure}[htp]
+  \subsection{CAT curves based on equal statistics using a reference.}
+
+  The example below shows how to plot CAT curves based on equal statistics,
+  using the data set A as the reference.
+  When equal ranks are used each CAT curve has its own probability intervals,
+  which therefore cannot be shown on the plot. 
+
+  \begin{center}
+  \setkeys{Gin}{width=0.75\textwidth}
+<<label=fig2,eval=TRUE,echo=TRUE,cache=FALSE,fig=TRUE, width=10, height=6>>=
+plotCat(catData = catHigh2LowWithRefByEqualStats, 
+	cex=1.2, lwd=1.2, cexPts=1.2, spacePts=30, col=c("red", "blue"), 
+	main="CAT curves for decreasing t-statistics",
+	where="center", legend=TRUE, legCex=1, ncol=1,
+	plotLayout = layout(matrix(1:2, ncol = 2), widths = c(2,1)))
+@
+\end{center}
+\caption{\small CAT-plot for curves based on equal t-statistics, using data set A as the reference.}
+\label{fig:two}
+\end{figure}
+
+
+\begin{figure}[htp]
+  \subsection{CAT curves based on equal ranks without using a reference.}
+
+  The example below shows how to plot CAT curves based on equal ranks,
+  along with probability intervals based on a fixed expected proportion
+  of similarly ranked features of 10\%, without using any data set as the 
+  reference (all pair combinations are shown).
+
+  \begin{center}
+  \setkeys{Gin}{width=0.75\textwidth}
+<<label=fig3,eval=TRUE,echo=TRUE,cache=FALSE,fig=TRUE, width=10, height=6>>=
+plotCat(catData = catHigh2LowNoRefByEqualRanks, 
+	preComputedPI=PIbyRefEqualRanks,
+	cex=1.2, lwd=1.2, cexPts=1.2, spacePts=30,
+	main="CAT curves for decreasing t-statistics",
+	where="center", legend=TRUE, legCex=1, ncol=1,
+	plotLayout = layout(matrix(1:2, ncol = 2), widths = c(2,1)))
+@
+\end{center}
+\caption{\small CAT-plot for curves based on equal ranks for all possible combinations of vectors.
+ Lighter to darker grey shades represent probability intervals for the distinct  quantiles 
+ of the hypergeometric distribution (0.999999, 0.999,  0.99, 0.95), assuming
+ 10\% of the features to be similarly ranked.}
+\label{fig:three}
+\end{figure}
+
+
+\begin{figure}[htp]
+  \subsection{CAT curves based on equal ranks, unspecified expected 
+    proportion of corresponding features.}
+
+  The example below shows how to plot CAT curves based on equal ranks,
+  along with probability intervals based on an unspecified expected proportion
+  of similarly ranked features, without using any data set as the 
+  reference (all pair combinations are shown).
+
+  \begin{center}
+  \setkeys{Gin}{width=0.75\textwidth}
+<<label=fig4,eval=TRUE,echo=TRUE,cache=FALSE,fig=TRUE, width=10, height=6>>=
+plotCat(catData = catHigh2LowNoRefByEqualRanks, 
+	preComputedPI=PIbyRefEqualRanksNoExpectedProp,
+	cex=1.2, lwd=1.2, cexPts=1.2, spacePts=30,
+	main="CAT curves for decreasing t-statistics",
+	where="center", legend=TRUE, legCex=1, ncol=1,
+	plotLayout = layout(matrix(1:2, ncol = 2), widths = c(2,1)))
+@
+\end{center}
+\caption{\small CAT-plot for curves based on equal ranks for all possible combinations of vectors.
+ Lighter to darker grey shades represent probability intervals for distinct  quantiles 
+ of the hypergeometric distribution (0.999999, 0.999,  0.99, 0.95). No expected proportion
+ of similarly ranked features is specified.}
+\label{fig:four}
+\end{figure}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\pagebreak
+
+\section{ {\Large \bf {System Information}}}
+Session information:
+
+<<sessioInfo, echo=TRUE, eval=TRUE, cache=FALSE, results=tex>>=
+toLatex(sessionInfo())
+@ 
+
+%\pagebreak
+\section{ {\Large \bf {Literature Cited}} }
+   \bibliographystyle{unsrt}
+   \bibliography{./matchBox}
+
+\end{document}

@@ -1,7 +1,0 @@
-useDynLib(KTSP)
-
-export(KTSP.tiedRank,
-	KTSP.CalculateSignedScore,
-	KTSP.Train,
-	KTSP.Train3TSP,
-	KTSP.Classify)
