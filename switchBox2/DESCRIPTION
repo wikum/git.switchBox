@@ -1,9 +1,0 @@
-Package: switchBox2
-Version: 0.99.1
-Date: 2013-02-03
-Title: SWitch Activated Pair Box
-Author: Bahman Afsari <bahman@jhu.edu>, Luigi Marchionni <marchion@jhu.edu>
-Maintainer: Bahman Afsari <bahman@jhu.edu>,  Luigi Marchionni <marchion@jhu.edu>
-Depends: R (>= 2.13.1)
-Description: The package offer different classifiers based on comparisons of pair of genes: e.g. KTSP: majority vote of comparisons of pair of genes. 
-License: GPL-2
