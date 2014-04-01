@@ -17,15 +17,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 %%% Preamble
 % \input{preamble}
-% \usepackage{fullpage}
-\usepackage{times}
-\usepackage[colorlinks=TRUE, urlcolor=blue, citecolor=blue]{hyperref}
+
 
 %%% Additional packages
 \usepackage{Sweave}
-\usepackage{authblk}
+\usepackage{times}
+\usepackage[colorlinks=TRUE, urlcolor=blue, citecolor=blue]{hyperref}
 \usepackage{color}
 \usepackage[usenames, dvipsnames]{xcolor}
+
+% \usepackage{authblk}
+% \usepackage{fullpage}
 
 %%% Sweave options
 \SweaveOpts{prefix.string=plots, eps=FALSE,echo=TRUE, keep.source=TRUE}
@@ -63,14 +65,12 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Authors 
-\author[1]{Bahman Afsari}
-\author[1]{Luigi Marchionni}
-
+%%% Authors and
+\author{Bahman Afsari and Luigi Marchionni\\\\
 %%% Affiliations
-\affil[1]{The Sidney Kimmel Comprehensive Cancer Center,
-  
-  Johns Hopkins University School of Medicine}
+The Sidney Kimmel Comprehensive Cancer Center,\\
+Johns Hopkins University School of Medicine
+}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
