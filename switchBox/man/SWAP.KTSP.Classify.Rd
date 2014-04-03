@@ -109,10 +109,8 @@ Geman et al.
 
 ##################################################
 ### Load gene expression data for the training set
-data(matTraining)
+data(trainingData)
 
-### Create a phenotypic group variable for the 78 samples
-trainingGroup <- factor(gsub(".+\\\\.", "", colnames(matTraining)))
 
 ### Show group variable for the TRAINING set
 table(trainingGroup)
@@ -146,13 +144,10 @@ table(trainingPrediction, trainingGroup)
 ### Testing on new data
 
 ### Load the example data for the TEST set
-data(matTesting)
-
-### Create the group variable from the column names 
-testGroup <- factor(gsub(".+\\\\.", "", colnames(matTesting)))
+data(testingData)
 
 ### Show group variable for the TEST set
-table(testGroup)
+table(testingGroup)
 
 ### Apply the classifier to one sample of the TEST set using default decision rule
 testPrediction <- SWAP.KTSP.Classify(matTesting[ , 1, drop=FALSE], classifier)
@@ -169,7 +164,7 @@ testPrediction <- SWAP.KTSP.Classify(matTesting,
 head(testPrediction, n=10)
 
 ### Contingency table for the TEST set
-table(testPrediction, testGroup)
+table(testPrediction, testingGroup)
 
 }
 

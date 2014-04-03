@@ -33,8 +33,6 @@ SWAP.Filter.Wilcoxon(phenoGroup, inputMat, featureNo = 100, UpDown = TRUE)
 
 \value{The names of the features that survided statistical filtering.}
 
-
-%\note{ }
  
 \seealso{
   \code{\link{SWAP.KTSP.Classify}},
@@ -83,10 +81,7 @@ Geman et al.
 \examples{
 
 ### Load gene expression data for the training set
-data(matTraining)
-
-### Create a phenotypic group variable for the 78 samples
-trainingGroup <- factor(gsub(".+\\\\.", "", colnames(matTraining)))
+data(trainingData)
 
 ### Return the top 10 features (both up and down)
 SWAP.Filter.Wilcoxon(trainingGroup, matTraining, featureNo=10)

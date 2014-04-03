@@ -65,11 +65,7 @@ KTSP.Train(data, situation, n)
 
 ##################################################
 ### Load gene expression data for the training set
-data(matTraining)
-
-### Create a phenotypic group variable for the 78 samples
-trainingGroup <- factor(gsub(".+\\\\.", "", colnames(matTraining)))
-levels(trainingGroup)
+data(trainingData)
 
 ### Turn into a numeric vector with values equal to 0 and 1
 trainingGroup <- as.numeric(trainingGroup) - 1

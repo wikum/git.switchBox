@@ -77,22 +77,18 @@ Geman et al.
 
 ##################################################
 ### Load gene expression data for the training set
-data(matTraining)
-
-### Create a phenotypic group variable for the 78 samples
-trainingGroup <- factor(gsub(".+\\\\.", "", colnames(matTraining)))
-levels(trainingGroup)
+data(trainingData)
 
 ### Turn into a numeric vector with values equal to 0 and 1
-trainingGroup <- as.numeric(trainingGroup) - 1
+trainingGroupNum <- as.numeric(trainingGroup) - 1
 
 ### Show group variable for the TRAINING set
-table(trainingGroup)
+table(trainingGroupNum)
 
 
 ##################################################
 ### Train a classifier using default filtering function based on the Wilcoxon test
-classifier <- KTSP.Train(matTraining, trainingGroup, n=8)
+classifier <- KTSP.Train(matTraining, trainingGroupNum, n=8)
 
 ### Show the classifier
 classifier
@@ -102,17 +98,13 @@ classifier
 ### Testing on new data
 
 ### Load the example data for the TEST set
-data(matTesting)
-
-### Create the group variable from the column names 
-testGroup <- factor(gsub(".+\\\\.", "", colnames(matTesting)))
-levels(testGroup)
+data(testingData)
 
 ### Turn into a numeric vector with values equal to 0 and 1
-testGroup <- as.numeric(testGroup) - 1
+testingGroupNum <- as.numeric(testingGroup) - 1
 
 ### Show group variable for the TEST set
-table(testGroup)
+table(testingGroupNum)
 
 ### Apply the classifier to one sample of the TEST set using
 ### sum of votes grearter than 2
@@ -120,7 +112,7 @@ testPrediction <- KTSP.Classify(matTesting, classifier,
      combineFunc = function(x) sum(x) > 2)
 
 ### Show prediction
-table(testPrediction)
+table(testPrediction, testingGroupNum)
 
 }
 

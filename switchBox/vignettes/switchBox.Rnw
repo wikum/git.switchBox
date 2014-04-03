@@ -157,7 +157,7 @@ Load the example training data contained in the \Rpackage{switchBox} package.
 
 <<trainData,eval=TRUE,echo=TRUE,cache=FALSE>>=
 ### Load the example data for the TRAINING set
-data(matTraining)
+data(trainingData)
 @
 
 The object \Robject{matTraining} is a numeric matrix containing 
@@ -174,12 +174,10 @@ dim(matTraining)
 str(matTraining)
 @
 
-Prognostic information can be extracted from the column names
-of the expression matrix, as follows:
+The factor \Robject{trainingGroup} contains
+the prognostic information:
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
-### The FIRST level is for "Bad" group
-trainingGroup <- factor(gsub(".+\\.", "", colnames(matTraining)))
 ### Show group variable for the TRAINING set
 table(trainingGroup)
 @ 
@@ -192,7 +190,7 @@ Load the example testing data contained in the \Rpackage{switchBox} package.
 
 <<testData,eval=TRUE,echo=TRUE,cache=FALSE>>=
 ### Load the example data for the TEST set
-data(matTesting)
+data(testingData)
 @
 
 The object \Robject{matTesting} is a numeric matrix containing 
@@ -209,14 +207,12 @@ dim(matTesting)
 str(matTesting)
 @
 
-Prognostic information can be extracted from the column names
-of the expression matrix, as follows:
+The factor \Robject{testingGroup} contains
+the prognostic information:
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
-### Create the group variable from the column names 
-testGroup <- factor(gsub(".+\\.", "", colnames(matTesting)))
 ### Show group variable for the TEST set
-table(testGroup)
+table(testingGroup)
 @ 
 
 
@@ -230,7 +226,7 @@ table(testGroup)
 We can train the KTSP algoritm using all possible feature pairs
 -- unrestricted KTSP classifier --
 with or without statistical feature filtering, 
-using the \Rfunction{SWAP.KTSP.Train}.
+using the \Rfunction{SWAP.KTSP.Train} function.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -313,7 +309,7 @@ random10(trainingGroup, matTraining)
 
 
 Below is a more realistic example of an alternative filtering function.
-In this case we use the \R \Rfunction{t.test} function to select the 
+In this case we use the {\R } \Rfunction{t.test} function to select the 
 features with an absolute t-statistics larger than a specified quantile.
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
@@ -343,7 +339,7 @@ classifier
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Training a Restricted KTSP algorithm}
 
-The \Rpackage{swithcBox3} allows to training a KTSP classifier
+The \Rpackage{swithcBox} allows to training a KTSP classifier
 using a pre-specified set of restricted feature pairs.
 This can be useful to implement KTSP classifiers mechanistically
 restricted. To achieve this the specific TSP to be used must
@@ -504,7 +500,7 @@ table(trainingPrediction, trainingGroup)
 
 We can apply the classifier using a specific decision to 
 combine the $K$ TSP as specified with the
-\Rfunarg{DecideFunc} argument of \Rfunction{SWAP/KTSP.Classify}.
+\Rfunarg{DecideFunc} argument of \Rfunction{SWAP.KTSP.Classify}.
 This argument is a function working on a logical vector \Rfunarg{x}
 containing the votes of each TSP.
 We can for instance count all votes for class one and then classify 
@@ -544,7 +540,7 @@ testPrediction <- SWAP.KTSP.Classify(matTesting, classifier)
 ### Show
 table(testPrediction)
 ### Resubstitution performance in the TEST set
-table(testPrediction, testGroup)
+table(testPrediction, testingGroup)
 @ 
 
 
@@ -560,7 +556,7 @@ a patient in one class or the other based on a specific threshold.
 testPrediction <- SWAP.KTSP.Classify(matTesting, classifier,
 				     DecisionFunc = function(x) sum(x) > 5.5 )
 ### Resubstitution performance in the TEST set
-table(testPrediction, testGroup)
+table(testPrediction, testingGroup)
 @ 
 
 
@@ -656,29 +652,26 @@ Preparation of phenotype information (a numeric vector
 with values equal to 0 or 1) for training the KTSP classifier:
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
-### Load gene expression data for the training set
-data(matTraining)
-### Create a phenotypic group variable for the 78 samples
-trainingGroup <- factor(gsub(".+\\.", "", colnames(matTraining)))
+### Phenotypic group variable for the 78 samples
+table(trainingGroup)
 levels(trainingGroup)
 ### Turn into a numeric vector with values equal to 0 and 1
-trainingGroup <- as.numeric(trainingGroup) - 1
+trainingGroupNum <- as.numeric(trainingGroup) - 1
 ### Show group variable for the TRAINING set
-table(trainingGroup)
+table(trainingGroupNum)
 @ 
 
-
-KTSP classifier training:
+KTSP classifier training using the deprected function:
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
 ### Train a classifier using default filtering function based on the Wilcoxon test
-classifier <- KTSP.Train(matTraining, trainingGroup, n=8)
+classifier <- KTSP.Train(matTraining, trainingGroupNum, n=8)
 ### Show the classifier
 classifier
 @ 
 
 
-KTSP classifier performance:
+KTSP classifier performance using the deprected function:
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
 ### Apply the classifier to one sample of the TEST set using
@@ -686,7 +679,7 @@ KTSP classifier performance:
 trainPrediction <- KTSP.Classify(matTraining, classifier,
 				 combineFunc = function(x) sum(x) < 2.5)
 ### Contingency table
-table(trainPrediction, trainingGroup)
+table(trainPrediction, trainingGroupNum)
 @ 
 
 
@@ -695,19 +688,18 @@ with values equal to 0 or 1) for testing the KTSP classifier
 on new data:
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
-### Load the example data for the TEST set
-data(matTesting)
-### Create the group variable from the column names 
-testGroup <- factor(gsub(".+\\.", "", colnames(matTesting)))
-levels(testGroup)
+### Phenotypic group variable for the 307 samples
+table(testingGroup)
+levels(testingGroup)
 ### Turn into a numeric vector with values equal to 0 and 1
-testGroup <- as.numeric(testGroup) - 1
+testingGroupNum <- as.numeric(testingGroup) - 1
 ### Show group variable for the TEST set
-table(testGroup)
+table(testingGroupNum)
 @ 
 
 
-Testing on new data and getting KTSP classifier performance:
+Testing on new data and getting KTSP classifier performance
+using the deprected function:
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
 ### Apply the classifier to one sample of the TEST set using
@@ -717,7 +709,7 @@ testPrediction <- KTSP.Classify(matTesting, classifier,
 ### Show prediction
 table(testPrediction)
 ### Contingency table
-table(testPrediction, testGroup)
+table(testPrediction, testingGroupNum)
 @
 
 

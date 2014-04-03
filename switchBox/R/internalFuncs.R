@@ -45,7 +45,7 @@ SWAP.Format.Input <- function(phenoGroup, inputMat, FilterFunc, RestrictedPairs,
 	## Apply filter function
 	if ( is.null(FilterFunc) ) {
 		Filter <- rownames(inputMat)
-		cat("No feaure filtering procedure will be used...\n")
+		cat("No feature filtering procedure will be used...\n")
 	} else {
 		cat("Applying filtering function to 'inputMat'...\n")
 		Filter <- FilterFunc(phenoGroup, inputMat, ...)

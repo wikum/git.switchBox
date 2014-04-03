@@ -13,7 +13,7 @@
 }
 
 \usage{
-data(matTraining)
+data(trainingData)
 }
 
 \format{
@@ -61,7 +61,7 @@ by Marchionni and colleagues in BMC Genomics (2013).
 \examples{
 
 ### Load gene expression data for the training set
-data(matTraining)
+data(trainingData)
 
 ### Show the class of the ``matTraining'' object
 class(matTraining)
@@ -71,12 +71,6 @@ dim(matTraining)
 
 ### Show the first  10 sample names of the ``matTraining'' matrix
 head(colnames(matTraining), n=10)
-
-### Create a phenotypic group variable for the 78 samples
-trainingGroup <- factor(gsub(".+\\\\.", "", colnames(matTraining)))
-
-### Show group variable
-table(trainingGroup)
 
 }
 

@@ -108,10 +108,8 @@ Geman et al.
 
 ##################################################
 ### Load gene expression data for the training set
-data(matTraining)
+data(trainingData)
 
-### Create a phenotypic group variable for the 78 samples
-trainingGroup <- factor(gsub(".+\\\\.", "", colnames(matTraining)))
 
 ### Show group variable for the TRAINING set
 table(trainingGroup)
