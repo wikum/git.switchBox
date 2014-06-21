@@ -1,4 +1,4 @@
-useDynLib(switchBox)
+useDynLib("switchBox", .registration=TRUE)
 
 export(SWAP.CalculateSignedScore,
 	SWAP.KTSP.Train,

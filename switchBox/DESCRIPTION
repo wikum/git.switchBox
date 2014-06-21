@@ -1,5 +1,5 @@
 Package: switchBox
-Version: 0.99.8
+Version: 0.99.10
 Date: 2014-03-20
 Title: Utilities to train and validate classifiers
       based on pair switching using the
@@ -9,5 +9,7 @@ Maintainer: Bahman Afsari <bahman@jhu.edu>, Luigi
       Marchionni <marchion@jhu.edu>
 Depends: R (>= 2.13.1)
 Description: The package offer different classifiers based on comparisons of pair of features (TSP), using various decision rules (e.g., majority wins principle).
+biocViews: Software, StatisticalMethod,
+      Classification
 License: GPL-2
-Packaged: 2014-04-01 14:01:49 UTC; marchion
+Packaged: 2014-06-18 22:19:46 UTC; marchion

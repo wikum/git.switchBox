@@ -67,12 +67,18 @@ SWAP.Format.Input <- function(phenoGroup, inputMat, FilterFunc, RestrictedPairs,
 	## Filter the inputMat for computing the classifier with "RestrictedPairs"
 	## Check the intersection between filtered features and restriceted pairs
 		moreFilter <- intersect(as.vector(RestrictedPairs), rownames(inputMat))
+		## CHECK HERE
+		## print(paste("Check1:", length(moreFilter)))
 		if ( length(moreFilter) < 4 ) {
 			stop("Not enough features left after filtering and restiction of pairs!")
 		} else {
 			cat("Restricting the analysis to the provided candidate TSPs\n")
 			## Subset to available feature set
+			## CHECK HERE
+			## print(paste("Check2:", dim(inputMat)))
 			inputMat <- inputMat[ moreFilter , ]
+			## CHECK HERE
+			## print(paste("Check3:", dim(inputMat)))
 			## Get the features
 			features <- rownames(inputMat)
 			## First find RestrictedPairs for which both features are available
@@ -89,7 +95,6 @@ SWAP.Format.Input <- function(phenoGroup, inputMat, FilterFunc, RestrictedPairs,
 			out <- list(inputMat = inputMat, FilteredPairs = FilteredPairs)
 		}
 	}
-
 	## Return inout data after filtering and/or pair restriction
 	return(out)
 }
@@ -177,9 +182,8 @@ calculateSignedScore <- function(phenoGroup , inputMat1, inputMat2,
 		pairsind[ , 2] <- match(RestrictedPairs[ , 2], rownames(inputMat2))
 
 		## How many fearures are used
-		cat(paste("Computing scores for ", pairsno, " features.\n",
-			  "This will require enough memory for ",
-			  formatC(pairsno*(m1-1)/2), " pairs.\n", sep=""))
+		cat(paste("Computing scores for ", pairsno, " available restricted pairs.\n",
+			  "This will require enough memory for ", pairsno, " pairs.\n", sep=""))
 
 		## Run the C code
 		d <- .C(

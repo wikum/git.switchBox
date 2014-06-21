@@ -75,7 +75,7 @@ Johns Hopkins University School of Medicine
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Date
-\date{Modified: March 20, 2014.  Compiled: \today}
+\date{Modified: June 20, 2014.  Compiled: \today}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,9 +108,52 @@ as used by Marchionni et al in \cite{Marchionni:2013aa}.
 KTSP is an extension of the TSP classifier described by Geman and colleagues
 \cite{Geman:2004aa,Tan:2005aa,Xu:2005aa}.
 The TSP algorithm is a simple binary classifier based on
-the ordering of two measurements.
+the ordering of two measurements.Basing the prediction solely on the ordering 
+of a small number of features (e.g. gene expressions), known as ranked based 
+methodology, seems a promising approach to to build robust classifiers to data 
+normalization and rise to more transparent decision rules. The first and simplest 
+of such methodologies, the Top-Scoring Pair ({\em TSP}) classifier, was 
+introduced in \cite{Geman:2004aa} and is based on reversal of two features 
+(e.g. the expressions of two genes). Multiple extensions were proposed 
+afterwards, e.g. \cite{Tan:2005aa} and many of these extensions have 
+been successfully applied for diagnosis and prognosis of cancer such as 
+recurrence of breast cancer in \cite{Marchionni:2013aa}. A popular 
+successor of {\em TSP} classifiers is {\em kTSP} (\cite{Tan:2005aa}), 
+which applies the majority voting among multiple of the the reversal of 
+pairs of features. In addition to being applied by peer scientists, {\em kTSP} 
+shown its power by wining the ICMLA the challenge for cancer classification 
+in the presence of other competitive methods such as Support Vector Machines
+(\cite{ICMLA08}).
 
-\textcolor{red}{ADD about TSP and KTSP}
+%\textcolor{red}{ADD about TSP and KTSP}
+kTSP decision is based on $k$ feature (e.g. gene) pairs, say,
+\(\Theta=\{(i_1,j_1),\dots,(i_k,j_k)\}\). If we denote the feature profile 
+with \(\underline{X}=(X_1,X_2,\dots)\), the family of rank based classifiers 
+is an aggregation of the comparisons \(X_{i_l}<X_{j_l}\). Specifically, the kTSP 
+statistics can be written as: \[\kappa = \{\sum_{l=1}^k I(X_{i_l}<X_{j_l})\}-\frac{k}{2},\] 
+where $I$ is the indicator function. The kTSP classification decision can be produced 
+by thresholding the \(\kappa\), i.e. \(\hat{Y}=I\{\kappa>\tau\}\) provided the 
+labels \(Y \in \{0,1\}\). The standard threshold is \(\tau=0\). The only parameters 
+required for calculating \(\kappa\) is the feature pairs. Usually, disjoint feature pairs are 
+desirable because an outlier feature value cannot heavily influence the decision. 
+In the introductory paper to kTSP (\cite{kTSPPaper}), the authors proposed an 
+ad-hoc method for feature selection. This method was based on score for each 
+pair of features which measures how discriminative is a comparison of the feature values. 
+If we denote the score related to the gene \(i\) and \(j\) by \(s_{ij}\), then the score was 
+defined as \[s_{ij}=|P(X_i<X_j|Y=1)-P(X_i<X_j|Y=0)|.\] We can sort the pairs of genes 
+by this score. A pair with large score (close to one) indicates that the reversal of the feature 
+value predicts the phenotype accurately.
+
+In \cite{KTSPAOAS}, an analysis of variance was proposed for gene selection in kTSP 
+and other rank-based classifiers. This method finds the feature pairs which make the 
+distribution of \(\kappa\) under two classes \emph{ far apart} in the analysis of 
+variance sense. In mathematical words, we seek the set of feature pairs, \(\Theta^*\), that
+\[\Theta^* = \arg\max_{\Theta}\frac{E(\kappa(\Theta)|Y=1)-E(\kappa(\Theta)|Y=0)}{\sqrt{Var(\kappa(\Theta)|Y=1)+Var(\kappa(\Theta)|Y=0)}}.\] 
+This method automatically chooses the number of genes and hence, 
+it is almost a parameter free method. However, the search for \(\Theta\) 
+is very intensive search. So, a greedy and approximate search was proposed 
+to find the optimal set of gene pairs. In practice, the only parameter required 
+is a maximum cap for the number pairs, $k$.
 
 The \Rpackage{switchBox} package contains several utilities 
 enabling to:
@@ -119,10 +162,10 @@ enabling to:
   \item Filter the features to be used to develop the classifier
     (\textit{i.e.}, differentially expressed genes);
   \item Compute the scores for all available feature pairs
-    to identify the top performing TSP;
+    to identify the top performing TSPs;
   \item Compute the scores for selected feature pairs
-    to identify the top performing TSP;
-  \item Identify the number of $K$ TSP to be used in the final classifier;
+    to identify the top performing TSPs;
+  \item Identify the number of top pairs, $K$, to be used in the final classifier;
   \item Compute individual TSP votes for one class or the other 
     and aggregate the votes based on various methods;
   \item Classify new samples based on the top KTSP 
@@ -341,14 +384,19 @@ classifier
 
 The \Rpackage{swithcBox} allows to training a KTSP classifier
 using a pre-specified set of restricted feature pairs.
-This can be useful to implement KTSP classifiers mechanistically
-restricted. To achieve this the specific TSP to be used must
-be defined using the \Rfunarg{RestrictedPairs}.
-As an example we can define a set of specific pairs 
-to be used for classifier development by randolmly selecting 
-some of the rownames from the \Robject{inputMat} matrix.
-In a real example these pairs would  be provided by the user.
-The restricted pairs must be encoded using valid names.
+This can be useful to implement KTSP classifiers restricted 
+to specific TSPs based, for instane, on prior biological information (\cite{iTSP}).
+To this end, the user must specify a set of candidate pairs by setting 
+\Rfunarg{RestrictedPairs} argument.
+
+As an example, we can define a set of candidate pairs by randolmly selecting 
+some of the rownames from the \Robject{inputMat} matrix and the classifier
+chooses from this set.
+
+In a real example these pairs would  be provided by the user,
+for instance usinf  prior biological knowledge. 
+The restricted pairs must contain valid feature names, 
+\textit{i.e.} the row names of \Robject{inputMat}.
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
 set.seed(123)
@@ -390,7 +438,7 @@ classifier
 \section{Calculate and aggregates the TSP votes}
 
 The \Rfunction{SWAP.KTSP.Statistics} function can be used to
-compute  and aggregate the TSP votes
+compute and aggregate the TSP votes
 using alternative functions to combine the votes.
 The default method is the count of the signed TSP votes.
 We can also  pass a different function to combine the KTSPs.
@@ -398,8 +446,8 @@ This function takes an argument \Rfunarg{x}
 -- a logical vector corresponding to the TSP votes --
 of length equal to the number of columns
 (\textit{e.g.}, the number of cancer patients under analysis)
-and aggregates the votes of all $K$ TSP of the classifier.
-
+and aggregates the votes of all $K$ TSPs of the classifier identified 
+by the training proces (see the \Rfunction{SWAP.KTSP.Train} function).
 
 Here we will use the default parameters 
 (the count of the signed TSP votes)
@@ -482,9 +530,10 @@ heatmap(1*ktspStatThreshold$comparisons, scale="none",
 \subsection{Classifiy training samples}
 
 The \Rfunction{SWAP.KTSP.Classify} function allows to
-classify one or more samples. 
-Below is shown the \textbf{resubstitution} performance in the 
-training set.
+classify one or more samples using the classifier identified 
+by \Rfunction{SWAP.KTSP.Train}. 
+The \textbf{resubstitution} performance in the 
+training set is shown below.
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
 ### Show the classifier
@@ -544,12 +593,10 @@ table(testPrediction, testingGroup)
 @ 
 
 
-We can apply the trained classifier to a new set of samples,
-using an alternative decision rule based 
-as specified by \Rfunarg{DecideFunc}.
-For instance we can apply the classifier to the test 
-counting all votes for class one and then classify 
-a patient in one class or the other based on a specific threshold.
+We can apply the trained classifier to predict of a new set of samples,
+using an alternative decision rule specified by \Rfunarg{DecideFunc}
+For instance, we can classify by thresholding vote counts in favor 
+of one of the classes.
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
 ### APlly the classifier using sum(x)  > 5.5
@@ -575,7 +622,7 @@ Compute the scores using all features for all possible pairs:
 
 <<eval=TRUE,echo=TRUE,cache=FALSE>>=
 ### Compute the scores using all features for all possible pairs
-scores <- SWAP.CalculateSignedScore(matTraining,  trainingGroup, FilterFunc=NULL, )
+scores <- SWAP.CalculateSignedScore(matTraining,  trainingGroup, FilterFunc=NULL)
 ### Show scores
 class(scores)
 dim(scores$score)

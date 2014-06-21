@@ -22,7 +22,7 @@
   \item{classifier}{The output of  \code{\link{KTSP.Train}},
     a KTSP classifier.}
   \item{combineFunc}{A user defined function to combine
-    the predictions of the individual K TSP.
+    the predictions of the individual K TSPs.
     If missing the consensus classification among the
     majority of the TSPs will be used.}
 }
@@ -39,38 +39,10 @@
   Luigi Marchionni \email{marchion@jhu.edu}
 }
 
-\source{
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/23682826}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16105897}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16131522}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16646797}
-}
-
 
 \references{
-  Marchionni et al.,
-  "A simple and reproducible breast cancer prognostic test.",
- \emph{BMC Genomics}, 2013, \bold{14}(1):336-342
-
- Tan et al.,
- "Simple decision rules for classifying human cancers from gene expression profiles.",
-\emph{Bioinformatics} (2005) \bold{21}(20), 3896-3904.
- 
- Xu et al., 
- "Robust prostate cancer marker genes emerge from direct integration
- of inter-study microarray data" 
-\emph{Bioinformatics} (2005) \bold{21}(20), 3905-3911.
-
-Geman et al.
-"Classifying gene expression profiles from pairwise mRNA comparisons"
-\emph{Statistical applications in genetics and molecular biology}
-(2004) \bold{3}.1 : 1071.
-
+See \link{switchBox} for the references.
 }
-
 
 
 \examples{
@@ -109,7 +81,7 @@ table(testingGroupNum)
 ### Apply the classifier to one sample of the TEST set using
 ### sum of votes grearter than 2
 testPrediction <- KTSP.Classify(matTesting, classifier,
-     combineFunc = function(x) sum(x) > 2)
+     combineFunc = function(x) sum(x) < 2.5)
 
 ### Show prediction
 table(testPrediction, testingGroupNum)

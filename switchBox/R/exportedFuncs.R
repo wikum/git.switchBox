@@ -194,7 +194,7 @@ SWAP.Filter.Wilcoxon <- function(phenoGroup, inputMat, featureNo = 100,
 	## Check inputMat conformity
 	SWAP.Check.Input(phenoGroup, inputMat)
 
-	## get ranks and perform test
+	## Get ranks and perform test
 	tiedData <- apply(inputMat, 2 , rank)
 	tiedDataP <- t(apply(tiedData, 1 , rank))
 	n <- sum(phenoGroup == levels(phenoGroup)[1])

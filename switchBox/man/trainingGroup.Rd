@@ -23,7 +23,7 @@ data(trainingData)
 
 \details{
 This phenotype factor corresponds to the breast cancer patients' cohort
-published by Glas and collleagues in BMC Genomics (2006).
+published by Glas and colleagues in BMC Genomics (2006).
 The information was obtained from
 the \code{mammaPrintData} package as described 
 by Marchionni and colleagues in BMC Genomics (2013).
@@ -39,21 +39,11 @@ by Marchionni and colleagues in BMC Genomics (2013).
   Luigi Marchionni \email{marchion@jhu.edu}
 }
 
-\source{
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/?term=17074082}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/?term=23682826}
-}
 
 \references{
- Marchionni et al.,
- "A simple and reproducible breast cancer prognostic test", 
- \emph{BMC Genomics}, 2013, \bold{14}(1):336-242
- 
- Glas et al et al., "Converting a breast cancer microarray signature
- into a high-throughput diagnostic test",
- {BMC Genomics}, 2006, \bold{7}:278-288
+See \link{switchBox} for the references.
 }
+
 
 \examples{
 

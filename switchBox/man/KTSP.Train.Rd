@@ -23,7 +23,7 @@ KTSP.Train(data, situation, n)
   \item{data}{the matrix of the values (usually gene expression)
     to be used to train the classifier. The columns represents samples
     and the rows represents the genes.}
-  \item{situation}{a vector containing the training labels.
+  \item{situation}{an integer vector containing the training labels.
     Its elements should be one or zero.}
   \item{n}{The number of disjoint TSP used for classification.
     If before n pairs, the score drops to zero, the TSP with zero score are ignored.}
@@ -34,7 +34,7 @@ KTSP.Train(data, situation, n)
   \item{TSPs}{a matrix containing TSPs indexes.}
   \item{score}{a vector containing TSPs scores.}
   \item{geneNames}{a matrix containing TSPs feature names.}
-  It should be passed to KTSP.Classify as for classification of test samples.
+  It should be passed to KTSP.Classify for classification of test samples.
 }
 
 
@@ -49,14 +49,9 @@ KTSP.Train(data, situation, n)
   Luigi Marchionni \email{marchion@jhu.edu}
 }
 
-\source{
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/23682826}
 
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16105897}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16131522}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16646797}
+\references{
+See \link{switchBox} for the references.
 }
 
 
@@ -68,15 +63,15 @@ KTSP.Train(data, situation, n)
 data(trainingData)
 
 ### Turn into a numeric vector with values equal to 0 and 1
-trainingGroup <- as.numeric(trainingGroup) - 1
+trainingGroupNum <- as.numeric(trainingGroup) - 1
 
-### Show group variable for the TRAINING set
-table(trainingGroup)
+### Show group variable for the TRAINING set 
+table(trainingGroupNum)
 
 
 ##################################################
 ### Train a classifier using default filtering function based on the Wilcoxon test
-classifier <- KTSP.Train(matTraining, trainingGroup, n=8)
+classifier <- KTSP.Train(matTraining, trainingGroupNum, n=8)
 
 ### Show the classifier
 classifier

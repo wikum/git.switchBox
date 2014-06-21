@@ -28,6 +28,27 @@ KTSP.tiedRank <- function(x) {
 ### P_ij = P(X_i<X_j|0) and Q(X_i<X_j|1)
 
 KTSP.CalculateSignedScore <- function(situation , data1, data2) {
+
+	## Check argument 'situation'
+	if (! is.numeric(situation)) {
+		stop("The argument 'situation' must be a numeric vector with values equal to '0' or '1'. \n")
+	}
+
+	## Check argument 'data1'
+	if ( ncol(data1) != length(situation)) {
+		stop("The number of 'data1' columns must be equal to the length of 'situation'. \n")
+	}
+	
+	## Check argument 'data2'
+	if ( ncol(data2) != length(situation)) {
+		stop("The number of 'data2' columns must be equal to the length of 'situation'. \n")
+	}
+
+	## Check arguments 'data1 and 'data2'
+	if ( ncol(data1) != ncol(data2)) {
+		stop("The number columns of 'data1' and 'data2' must be equal. \n")
+	}
+
 	
 	n <- length(situation)
 	m1 <- nrow(data1)
@@ -52,6 +73,8 @@ KTSP.CalculateSignedScore <- function(situation , data1, data2) {
 		     M=(matrix(d[[8]],nrow=1)),k=(matrix(d[[9]],nrow=m1)),
 		     N=(matrix(d[[10]],nrow=1)),
 		     P=(matrix(d[[11]],nrow=m1)),Q=(matrix(d[[12]],nrow=m1)))
+	return(retVal)
+
 }
 
 
@@ -66,31 +89,48 @@ KTSP.CalculateSignedScore <- function(situation , data1, data2) {
 
 KTSP.Train <- function(data, situation, n) {
 
+	## Check argument 'situation'
+	if (! is.numeric(situation)) {
+		stop("The argument 'situation' must be a numeric vector with values equal to '0' or '1'. \n")
+	}
+
+	## Check argument 'data'
+	if ( ncol(data) != length(situation)) {
+		stop("The number of 'data' columns must be equal to the length of 'situation'. \n")
+	}
+
+	## Check argument 'n'
+	if (! is.numeric(situation)) {
+		stop("The argument 'n' must be a single integer specifying the TSP number used in the classifier. \n")
+	}
+
+	
 	data <- switchBox:::KTSP.tiedRank( data )
 	KTSPout <- switchBox:::KTSP.CalculateSignedScore(situation , data, data)
-	TSPs <- matrix(0,n,2)
+	TSPs <- matrix(0, n, 2)
 	TSPscore <- vector(length=n)
-	TSPGenes <- matrix("",n,2)
+	TSPGenes <- matrix("", n, 2)
 	geneNames <- rownames(data)
 	score <- KTSPout$score
 
 	for (i in 1:n)	{
-		TSPs[i,] <- arrayInd(which.max(score),.dim=dim(score))
-		TSPscore[i] <- score[TSPs[i,1],TSPs[i,2]]/2
-		TSPGenes[i,] <- geneNames[TSPs[i,]]
-		score[TSPs[i,1],] <- 0
-		score[TSPs[i,2],] <- 0
-		score[,TSPs[i,1]] <- 0
-		score[,TSPs[i,2]] <- 0
+		TSPs[i,] <- arrayInd(which.max(score), .dim=dim(score))
+		TSPscore[i] <- score[TSPs[i, 1], TSPs[i, 2]]/2
+		TSPGenes[i, ] <- geneNames[TSPs[i, ]]
+		score[TSPs[i , 1] , ] <- 0
+		score[TSPs[i , 2] , ] <- 0
+		score[ , TSPs[i , 1]] <- 0
+		score[ , TSPs[i , 2]] <- 0
 
 		if (norm(score) < 1e-4) {
-			TSPs <- TSPs[1:i,]
-			TSPscore <- TSPscore[1:i]
+			TSPs <- TSPs[ 1:i , ]
+			TSPscore <- TSPscore[ 1:i ]
 			break
 		}
 	}
 
 	retVal <- list(TSPs=TSPs, score=TSPscore, geneNames=TSPGenes)
+	return(retVal)
 }
 
 
@@ -103,8 +143,18 @@ KTSP.Train <- function(data, situation, n) {
 
 KTSP.Classify <- function(data, classifier, combineFunc) {
 
-	##evaluate combination function
-	if (missing(combineFunc)) {
+	## Check argument 'classifier'
+	if (missing(classifier)) {
+		stop("A valid 'classifier' is needed to classify new data. \n")
+	}
+
+	## Check argument 'combineFunc'
+	if (! missing(combineFunc)) {
+		if (! is.function(combineFunc)) {
+			stop("If provided 'combineFunc' must be a function. \n")
+		}
+	} else {
+		## set combineFunc if missing
 		combineFunc <- function(x) {
 			mean(x) < 0.5
 		}

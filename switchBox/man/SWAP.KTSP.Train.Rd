@@ -2,11 +2,10 @@
 
 \alias{SWAP.KTSP.Train}
 
-\title{Function for  training the K-TSP classifier.}
+\title{Function for training the K-TSP classifier.}
 
 \description{
-  \code{SWAP.KTSP.Train} trains a K-TSP classifier
-  for the specific phenotype of interest.
+  \code{SWAP.KTSP.Train} trains a binary K-TSP classifier.
   The classifiers resulting from using this function can be
   passed to \code{\link{SWAP.KTSP.Classify}}
   for samples classification.
@@ -26,20 +25,29 @@ SWAP.KTSP.Train(inputMat, phenoGroup, krange = c(3, 5, 7:10),
     The number of columns must agree
     with the length of \code{phenoGroup}.
     Note that \code{rownames(inputMat)} will be used
-    as must feature names (\emph{e.g.}, gene symbols)
-    in all subsequen analyses.}
-  \item{phenoGroup}{ is a factor containing the training phenotypes
-    with two levels.}
+    as the feature names (\emph{e.g.}, gene symbols)
+    in all subsequent analyses.}
+  \item{phenoGroup}{is a factor with two levels containing
+    the phenotype information used to train the K-TSP classifier.
+    In order to identify the best TSP to be included in the classifier,
+    the features contained in \code{inputMat} will be compared
+    between the two groups defined by this factor.
+    Levels from \code{phenoGroup} will be also used
+    to reorder the features in each TSP such as the first feature
+    is larger than the second one in the group corresponding
+    to first level, and \emph{vice-versa}.}
   \item{krange}{an integer (or a vector of integers)
-    defining the number of possible disjoint 
-    Top Scoring Pairs (TSPs) from which to chose
-    to build the final classifier.}
+    defining the candidate number of  
+    Top Scoring Pairs (TSPs) from which the algorithm chooses
+    to build the final classifier. The algorithm uses the mechanism
+    in Afsari et al (AOAS, 2014) to select the number of pairs and pair of features. }
   \item{FilterFunc}{is a filtering function to reduce the
     starting number of features to be used to identify the
-    Top Scoring Pairs (TSP). The deault filter is based on
-    the Wilcoxon rank-sum test
+    Top Scoring Pairs (TSP). The default filter is differential 
+    expression test based on the Wilcoxon rank-sum test
     and alternative filtering functions can be passed too
-    (see \code{SWAP.Filter.Wilcoxon} for details).}
+    (see \code{SWAP.Filter.Wilcoxon} for details). The output of the function 
+    must be subset of \code{rownames(inputMat)}}
   \item{RestrictedPairs}{is a character matrix with two columns
     containing the feature pairs to be considered for score calculations.
     Each row should contain a pair of feature names matching the
@@ -56,9 +64,21 @@ SWAP.KTSP.Train(inputMat, phenoGroup, krange = c(3, 5, 7:10),
   \item{name}{The classifier name.}
   \item{TSPs}{A \code{k} by 2 matrix, containing
     the feature names for each TSP. These names
-  correspond to the \code{rownames(inputData)}.}
-  \item{$score}{TSP scores for the top \code{k} TSPs.}
-  \item{$label}{The class labels.}
+    correspond to the \code{rownames(inputData)}.
+    In this matrix each row corresponds to a specific TSP.
+    For each TSP (\emph{i.e.} row in the \code{TSPs} matrix)
+    the order of the feature is such that the first feature
+    is larger than the second one in the phenotypic group
+    defined by the first levels of the \code{phenoGroup} factor
+    and \emph{vice-versa}.
+    The algorithm uses the mechanism
+    in Afsari et al (2014) to select the number
+    of pairs and pair of features.}
+  \item{$score}{scores TSP for the top \code{k} TSPs.}
+  \item{$label}{The class labels. These labels correspond to
+    the \code{phenoGroup} factor lelves and will be used
+    lable any new sample classified by the \code{SWAP.KTSP.Classify}
+    function.}
 }
 
 \seealso{
@@ -73,36 +93,11 @@ SWAP.KTSP.Train(inputMat, phenoGroup, krange = c(3, 5, 7:10),
   Luigi Marchionni \email{marchion@jhu.edu}
 }
 
-\source{
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/23682826}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16105897}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16131522}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16646797}
-}
 
 \references{
-  Marchionni et al.,
-  "A simple and reproducible breast cancer prognostic test.",
- \emph{BMC Genomics}, 2013, \bold{14}(1):336-342
-
- Tan et al.,
- "Simple decision rules for classifying human cancers from gene expression profiles.",
-\emph{Bioinformatics} (2005) \bold{21}(20), 3896-3904.
- 
- Xu et al., 
- "Robust prostate cancer marker genes emerge from direct integration
- of inter-study microarray data" 
-\emph{Bioinformatics} (2005) \bold{21}(20), 3905-3911.
-
-Geman et al.
-"Classifying gene expression profiles from pairwise mRNA comparisons"
-\emph{Statistical applications in genetics and molecular biology}
-(2004) \bold{3}.1 : 1071.
-
+See \link{switchBox} for the references.
 }
+
 
 \examples{
 
@@ -117,7 +112,7 @@ table(trainingGroup)
 
 ##################################################
 ### Train a classifier using default filtering function based on the Wilcoxon test
-classifier <- SWAP.KTSP.Train(matTraining, trainingGroup, krange=c(3:15))
+classifier <- SWAP.KTSP.Train(matTraining, trainingGroup, krange=c(3, 5, 8:15))
 
 ### Show the classifier
 classifier

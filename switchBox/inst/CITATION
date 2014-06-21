@@ -15,6 +15,6 @@ bibentry("Article",
          paste("Marchionni L, et al.",
                "A simple and reproducible breast cancer prognostic test.",
                "BMC Genomics, 2013;14(1):336"),
-         mheader = "To cite switchBox2 in publications use:"
+         mheader = "To cite switchBox in publications use:"
          )
 

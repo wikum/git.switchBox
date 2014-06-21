@@ -23,7 +23,7 @@ data(testingData)
 
 \details{
 This phenotype factor corresponds to the breast cancer patients' cohort
-published by Buyse and collleagues in JNCI (2006).
+published by Buyse and colleagues in JNCI (2006).
 The gene expression matrix was obtained from
 the \code{mammaPrintData} package as described 
 by Marchionni and colleagues in BMC Genomics (2013).
@@ -39,21 +39,11 @@ by Marchionni and colleagues in BMC Genomics (2013).
   Luigi Marchionni \email{marchion@jhu.edu}
 }
 
-\source{
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/?term=16954471}
-  
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/?term=23682826}
-}
 
 \references{
- Marchionni et al.,
- "A simple and reproducible breast cancer prognostic test", 
- \emph{BMC Genomics}, 2013, \bold{14}(1):336-342
- 
- Buyse et al., "Validation and clinical utility of a 70-gene prognostic
- signature for women with node-negative breast cancer",
- \emph{JNCI}, 2006, \bold{98}(17):1183-1192
+See \link{switchBox} for the references.
 }
+
 
 \examples{
 

@@ -16,23 +16,23 @@ SWAP.KTSP.Classify(inputMat, classifier, DecisionFunc)
 \arguments{
   \item{inputMat}{is a numerical matrix containing the
     measurements (\emph{e.g.}, gene expression data)
-    to be used to build the K-TSP classifier.
-    The columns represent samples and the
-    rows represent the features (\emph{e.g.}, genes).
-    The number of columns must agree
-    with the length of \code{phenoGroup}.
+    to be used with a K-TSP classifier to classify the samples
+    in a specific class or the other.
+    In this numerical matrix the columns represent the samples
+    and the rows represent the features (\emph{e.g.}, genes)
+    used by the classification rule.
     Note that \code{rownames(inputMat)} will be used
-    as must feature names (\emph{e.g.}, gene symbols)
-    in all subsequen analyses.}
-  \item{classifier}{the classifier obtained by running
+    to select the features (\emph{e.g.}, gene symbols)
+    contained in the K-TSP classifier.}
+  \item{classifier}{the classifier obtained by invoking
     \code{\link{SWAP.KTSP.Train}}.}
-  \item{DecisionFunc}{ is the function used to achieve
-    the final classification based on the TSPs contained
+  \item{DecisionFunc}{ is the function used to generate the final 
+   classification prediction by combining the comparisons of the TSPs 
     in the classifier. By default each sample is classified
     according to the class voted by the majority of the TSPs
     (``majority wins''  principle).
     Different decision rules can be also specified using
-    altenative functions passed \code{DecisionFunc},
+    alternative functions passed \code{DecisionFunc},
     as described below (see ``details'').}
 }
 
@@ -44,9 +44,9 @@ SWAP.KTSP.Classify(inputMat, classifier, DecisionFunc)
 
 \details{
   The \code{SWAP.KTSP.Classify} classifies new test samples
-  based on a specific decision rule. By default each sample
-  is classified based on the class voted by the majority of the TSPs
-  contained in the classifier.
+  based on a specific decision rule. By default, each sample
+  is classified based on the the majority voting rule of 
+  the comparisons of TSPs in the classifier.
   Alternative rules can be defined by the user and passed
   to \code{SWAP.KTSP.Classify} using the argument
   \code{DecisionFunc}. A decision function takes
@@ -54,7 +54,7 @@ SWAP.KTSP.Classify(inputMat, classifier, DecisionFunc)
   to the individual decision of each TSP
   (\code{TRUE} if the first feature in the pair is
   larger then the second, \code{FALSE}
-  in the opposite case). The output of thae
+  in the opposite case). The output of the
   \code{DecisionFunction} is a single logical
   value summarizing all votes of the individual TSPs
   (see examples below).
@@ -62,7 +62,7 @@ SWAP.KTSP.Classify(inputMat, classifier, DecisionFunc)
 
  
 \seealso{
-  \code{\link{SWAP.KTSP.Classify}},
+  \code{\link{SWAP.KTSP.Train}},
   \code{\link{SWAP.Filter.Wilcoxon}},
   \code{\link{SWAP.CalculateSignedScore}}
 }
@@ -73,35 +73,8 @@ SWAP.KTSP.Classify(inputMat, classifier, DecisionFunc)
   Luigi Marchionni \email{marchion@jhu.edu}
 }
 
-\source{
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/23682826}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16105897}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16131522}
-
-  \url{http://www.ncbi.nlm.nih.gov/pubmed/16646797}
-}
-
 \references{
-  Marchionni et al.,
-  "A simple and reproducible breast cancer prognostic test.",
- \emph{BMC Genomics}, 2013, \bold{14}(1):336-342
-
- Tan et al.,
- "Simple decision rules for classifying human cancers from gene expression profiles.",
-\emph{Bioinformatics} (2005) \bold{21}(20), 3896-3904.
- 
- Xu et al., 
- "Robust prostate cancer marker genes emerge from direct integration
- of inter-study microarray data" 
-\emph{Bioinformatics} (2005) \bold{21}(20), 3905-3911.
-
-Geman et al.
-"Classifying gene expression profiles from pairwise mRNA comparisons"
-\emph{Statistical applications in genetics and molecular biology}
-(2004) \bold{3}.1 : 1071.
-
+See \link{switchBox} for the references.
 }
 
 
@@ -118,7 +91,7 @@ table(trainingGroup)
 
 ##################################################
 ### Train a classifier using default filtering function based on the Wilcoxon test
-classifier <- SWAP.KTSP.Train(matTraining, trainingGroup, krange=c(3:15))
+classifier <- SWAP.KTSP.Train(matTraining, trainingGroup, krange=c(3, 5, 8:15))
 
 ### Show the classifier
 classifier

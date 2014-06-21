@@ -9,14 +9,14 @@ rm(list=ls())
 
 
 ###################################################
-### code chunk number 2: switchBox.Rnw:138-140 (eval = FALSE)
+### code chunk number 2: switchBox.Rnw:181-183 (eval = FALSE)
 ###################################################
 ## source("http://bioconductor.org/biocLite.R")
 ## biocLite("switchBox")
 
 
 ###################################################
-### code chunk number 3: switchBox.Rnw:144-145
+### code chunk number 3: switchBox.Rnw:187-188
 ###################################################
 require(switchBox)
 
@@ -29,7 +29,7 @@ data(trainingData)
 
 
 ###################################################
-### code chunk number 5: switchBox.Rnw:171-174
+### code chunk number 5: switchBox.Rnw:214-217
 ###################################################
 class(matTraining)
 dim(matTraining)
@@ -37,7 +37,7 @@ str(matTraining)
 
 
 ###################################################
-### code chunk number 6: switchBox.Rnw:180-182
+### code chunk number 6: switchBox.Rnw:223-225
 ###################################################
 ### Show group variable for the TRAINING set
 table(trainingGroup)
@@ -51,7 +51,7 @@ data(testingData)
 
 
 ###################################################
-### code chunk number 8: switchBox.Rnw:204-207
+### code chunk number 8: switchBox.Rnw:247-250
 ###################################################
 class(matTesting)
 dim(matTesting)
@@ -59,14 +59,14 @@ str(matTesting)
 
 
 ###################################################
-### code chunk number 9: switchBox.Rnw:213-215
+### code chunk number 9: switchBox.Rnw:256-258
 ###################################################
 ### Show group variable for the TEST set
 table(testingGroup)
 
 
 ###################################################
-### code chunk number 10: switchBox.Rnw:238-246
+### code chunk number 10: switchBox.Rnw:281-289
 ###################################################
 ### The arguments to the "SWAP.KTSP.Train" function
 args(SWAP.KTSP.Train)
@@ -79,7 +79,7 @@ classifier$TSPs
 
 
 ###################################################
-### code chunk number 11: switchBox.Rnw:257-262
+### code chunk number 11: switchBox.Rnw:300-305
 ###################################################
 ### The arguments to the "SWAP.KTSP.Train" function
 args(SWAP.Filter.Wilcoxon)
@@ -89,7 +89,7 @@ SWAP.Filter.Wilcoxon(trainingGroup, matTraining, featureNo=4)
 
 
 ###################################################
-### code chunk number 12: switchBox.Rnw:269-275
+### code chunk number 12: switchBox.Rnw:312-318
 ###################################################
 ### Train a classifier from the top 4 best genes 
 ### according to Wilcoxon filtering function
@@ -100,7 +100,7 @@ classifier
 
 
 ###################################################
-### code chunk number 13: switchBox.Rnw:281-285
+### code chunk number 13: switchBox.Rnw:324-328
 ###################################################
 ### To use all features "FilterFunc" must be set to NULL
 classifier <- SWAP.KTSP.Train(matTraining, trainingGroup, FilterFunc=NULL)
@@ -109,7 +109,7 @@ classifier
 
 
 ###################################################
-### code chunk number 14: switchBox.Rnw:304-307
+### code chunk number 14: switchBox.Rnw:347-350
 ###################################################
 ### An alternative filtering function selecting 20 random features
 random10 <- function(situation, data) { sample(rownames(data), 10) }
@@ -117,7 +117,7 @@ random10(trainingGroup, matTraining)
 
 
 ###################################################
-### code chunk number 15: switchBox.Rnw:315-322
+### code chunk number 15: switchBox.Rnw:358-365
 ###################################################
 ### An alternative filtering function based on a t-test
 topRttest <- function(situation, data, quant = 0.75) {
@@ -129,7 +129,7 @@ topRttest(trainingGroup, matTraining, quant=0.95)
 
 
 ###################################################
-### code chunk number 16: switchBox.Rnw:330-335
+### code chunk number 16: switchBox.Rnw:373-378
 ###################################################
 ### Train with t-test and krange
 classifier <- SWAP.KTSP.Train(matTraining, trainingGroup,
@@ -139,7 +139,7 @@ classifier
 
 
 ###################################################
-### code chunk number 17: switchBox.Rnw:353-357
+### code chunk number 17: switchBox.Rnw:401-405
 ###################################################
 set.seed(123)
 somePairs <- matrix(sample(rownames(matTraining), 6^2, replace=FALSE), ncol=2)
@@ -148,7 +148,7 @@ dim(somePairs)
 
 
 ###################################################
-### code chunk number 18: switchBox.Rnw:364-369
+### code chunk number 18: switchBox.Rnw:412-417
 ###################################################
 ### Train
 classifier <- SWAP.KTSP.Train(matTraining, trainingGroup,
@@ -158,7 +158,7 @@ classifier
 
 
 ###################################################
-### code chunk number 19: switchBox.Rnw:377-384
+### code chunk number 19: switchBox.Rnw:425-432
 ###################################################
 ### Train
 classifier <- SWAP.KTSP.Train(matTraining, trainingGroup,
@@ -170,7 +170,7 @@ classifier
 
 
 ###################################################
-### code chunk number 20: switchBox.Rnw:407-420
+### code chunk number 20: switchBox.Rnw:455-468
 ###################################################
 ### Train a classifier
 classifier <- SWAP.KTSP.Train(matTraining, trainingGroup,
@@ -188,7 +188,7 @@ head(ktspStatDefault$statistics)
 
 
 ###################################################
-### code chunk number 21: switchBox.Rnw:426-431
+### code chunk number 21: switchBox.Rnw:474-479
 ###################################################
 ### Compute
 ktspStatSum <- SWAP.KTSP.Statistics(inputMat = matTraining,
@@ -198,7 +198,7 @@ head(ktspStatSum$statistics)
 
 
 ###################################################
-### code chunk number 22: switchBox.Rnw:437-442
+### code chunk number 22: switchBox.Rnw:485-490
 ###################################################
 ### Compute
 ktspStatThreshold <- SWAP.KTSP.Statistics(inputMat = matTraining,
@@ -208,7 +208,7 @@ head(ktspStatThreshold$statistics)
 
 
 ###################################################
-### code chunk number 23: switchBox.Rnw:450-455 (eval = FALSE)
+### code chunk number 23: switchBox.Rnw:498-503 (eval = FALSE)
 ###################################################
 ## ### Make a heatmap showing the individual TSPs votes
 ## colorForRows <- as.character(1+as.numeric(trainingGroup))
@@ -228,7 +228,7 @@ heatmap(1*ktspStatThreshold$comparisons, scale="none",
 
 
 ###################################################
-### code chunk number 25: switchBox.Rnw:489-497
+### code chunk number 25: switchBox.Rnw:538-546
 ###################################################
 ### Show the classifier
 classifier
@@ -241,7 +241,7 @@ table(trainingPrediction, trainingGroup)
 
 
 ###################################################
-### code chunk number 26: switchBox.Rnw:509-516
+### code chunk number 26: switchBox.Rnw:558-565
 ###################################################
 ### Usr a CombineFunc based on  sum(x) > 5.5
 trainingPrediction <- SWAP.KTSP.Classify(matTraining, classifier,
@@ -253,7 +253,7 @@ table(trainingPrediction, trainingGroup)
 
 
 ###################################################
-### code chunk number 27: switchBox.Rnw:525-529
+### code chunk number 27: switchBox.Rnw:574-578
 ###################################################
 ### Classify one sample
 testPrediction <- SWAP.KTSP.Classify(matTesting[ , 1, drop=FALSE], classifier)
@@ -262,7 +262,7 @@ testPrediction
 
 
 ###################################################
-### code chunk number 28: switchBox.Rnw:537-543
+### code chunk number 28: switchBox.Rnw:586-592
 ###################################################
 ### Apply the classifier to the complete TEST set
 testPrediction <- SWAP.KTSP.Classify(matTesting, classifier)
@@ -273,7 +273,7 @@ table(testPrediction, testingGroup)
 
 
 ###################################################
-### code chunk number 29: switchBox.Rnw:554-559
+### code chunk number 29: switchBox.Rnw:601-606
 ###################################################
 ### APlly the classifier using sum(x)  > 5.5
 testPrediction <- SWAP.KTSP.Classify(matTesting, classifier,
@@ -283,17 +283,17 @@ table(testPrediction, testingGroup)
 
 
 ###################################################
-### code chunk number 30: switchBox.Rnw:576-581
+### code chunk number 30: switchBox.Rnw:623-628
 ###################################################
 ### Compute the scores using all features for all possible pairs
-scores <- SWAP.CalculateSignedScore(matTraining,  trainingGroup, FilterFunc=NULL, )
+scores <- SWAP.CalculateSignedScore(matTraining,  trainingGroup, FilterFunc=NULL)
 ### Show scores
 class(scores)
 dim(scores$score)
 
 
 ###################################################
-### code chunk number 31: switchBox.Rnw:588-592
+### code chunk number 31: switchBox.Rnw:635-639
 ###################################################
 ### Get the scores
 scoresOfInterest <- diag(scores$score[ classifier$TSPs[,1] , classifier$TSPs[,2] ])
@@ -302,7 +302,7 @@ all(classifier$score == abs(scoresOfInterest))
 
 
 ###################################################
-### code chunk number 32: switchBox.Rnw:602-613
+### code chunk number 32: switchBox.Rnw:649-660
 ###################################################
 ### Compute the scores with default filtering function
 scores <- SWAP.CalculateSignedScore(matTraining, trainingGroup, featureNo=20 )
@@ -318,7 +318,7 @@ length(scores$score)
 
 
 ###################################################
-### code chunk number 33: switchBox.Rnw:620-621 (eval = FALSE)
+### code chunk number 33: switchBox.Rnw:667-668 (eval = FALSE)
 ###################################################
 ## hist(scores$score, col="salmon", main="TSP scores")
 
@@ -330,7 +330,7 @@ hist(scores$score, col="salmon", main="TSP scores")
 
 
 ###################################################
-### code chunk number 35: switchBox.Rnw:654-661
+### code chunk number 35: switchBox.Rnw:701-708
 ###################################################
 ### Phenotypic group variable for the 78 samples
 table(trainingGroup)
@@ -342,7 +342,7 @@ table(trainingGroupNum)
 
 
 ###################################################
-### code chunk number 36: switchBox.Rnw:666-670
+### code chunk number 36: switchBox.Rnw:713-717
 ###################################################
 ### Train a classifier using default filtering function based on the Wilcoxon test
 classifier <- KTSP.Train(matTraining, trainingGroupNum, n=8)
@@ -351,7 +351,7 @@ classifier
 
 
 ###################################################
-### code chunk number 37: switchBox.Rnw:676-682
+### code chunk number 37: switchBox.Rnw:723-729
 ###################################################
 ### Apply the classifier to one sample of the TEST set using
 ### sum of votes less  than 2.5
@@ -362,7 +362,7 @@ table(trainPrediction, trainingGroupNum)
 
 
 ###################################################
-### code chunk number 38: switchBox.Rnw:690-697
+### code chunk number 38: switchBox.Rnw:737-744
 ###################################################
 ### Phenotypic group variable for the 307 samples
 table(testingGroup)
@@ -374,7 +374,7 @@ table(testingGroupNum)
 
 
 ###################################################
-### code chunk number 39: switchBox.Rnw:704-712
+### code chunk number 39: switchBox.Rnw:751-759
 ###################################################
 ### Apply the classifier to one sample of the TEST set using
 ### sum of votes less than 2.5
