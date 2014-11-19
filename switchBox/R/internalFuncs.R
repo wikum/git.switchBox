@@ -321,12 +321,12 @@ SWAP.KTSP.Train.Restricted <- function(inputMat, phenoGroup, maxK, RestrictedPai
 	classifier$TSPs <- pairs$pairs[ 1:maxTSPs , ]
 
 	## Swap gene order in the pair for pairs with negative score
-	negPairs <- which(pairs$scores < 0)
-	classifier$TSPs[negPairs,] <- classifier$TSPs[negPairs, 2:1]
+	posPairs <- which(pairs$scores > 0)
+	classifier$TSPs[posPairs , ] <- classifier$TSPs[posPairs , 2:1]
 
 	### Flippling the negative scores
 	classifier$score <- pairs$scores[ 1:maxTSPs , ]
-	classifier$score[negPairs] <- -1*classifier$score[negPairs]
+	classifier$score <- abs(classifier$score)
 	
 	## Prepare the score and labels components
 	classifier$name <- sprintf('%dTSPs', maxTSPs)
